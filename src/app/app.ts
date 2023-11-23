@@ -9,9 +9,6 @@ app.use(express.json())
 app.use(cors())
 app.use(morgan('dev'))
 
-// error boundary middleware
-app.use(notFoundError)
-app.use(errorHandler)
 
 // health route
 app.get('/health',(_req: Request,res: Response) => {
@@ -20,5 +17,9 @@ app.get('/health',(_req: Request,res: Response) => {
     message: 'Route Health is Good'
   })
 })
+
+// error boundary middleware
+app.use(notFoundError)
+app.use(errorHandler)
 
 export default app
