@@ -5,7 +5,7 @@ import {z} from "zod";
 const userNameSchemaValidation = z.object({
   firstName: z.string({required_error: "firstName must be required"}).trim().max(20,{message: "FirstName maximum characters length is 20"}).refine((val) => {
     const firstNameCapitalize = val.charAt(0).toUpperCase() + val.slice(1)
-    return firstNameCapitalize !== val
+    return firstNameCapitalize === val
   },{message: "FirstName must be capitalize"}),
   lastName: z.string({required_error: 'lastName must be required'}).trim().max(20,{message: "FirstName maximum characters length is 20"})
 })

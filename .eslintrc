@@ -17,7 +17,8 @@
     "@stylistic/js/indent": ["error", 2],
     "prefer-const": "error",
     "no-console": "warn",
-    "no-undef": "error"
+    "no-undef": "error",
+    "@typescript-eslint/no-explicit-any": 0
   },
   "globals": {
     "process": "readonly"

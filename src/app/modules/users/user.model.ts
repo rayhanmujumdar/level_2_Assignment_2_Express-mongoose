@@ -1,5 +1,7 @@
 import { Schema,model } from "mongoose";
-import { TAddress, TOrder, TUser, TUsername } from "./user.interface";
+import { IUserModel, TAddress, TOrder, TQuery, TUser, TUsername } from "./user.interface";
+import bcrypt from "bcrypt"
+import config from "../../config";
 
 // fullName schema
 const userNameSchema = new Schema<TUsername>({
@@ -11,7 +13,7 @@ const userNameSchema = new Schema<TUsername>({
     type: String,
     required: [true,"lastName must be required"]
   }
-})
+},{_id: false})
 
 // address Schema
 const addressSchema = new Schema<TAddress>({
@@ -27,7 +29,7 @@ const addressSchema = new Schema<TAddress>({
     type: String,
     required: [true,"country must be required"]
   }
-})
+},{_id: false})
 
 // order schema
 const orderSchema = new Schema<TOrder>({
@@ -43,12 +45,12 @@ const orderSchema = new Schema<TOrder>({
     type: Number,
     required: [true,"quantity must be required"]
   }
-})
+},{_id: false})
 
 
 
 // userSchema
-const userSchema = new Schema<TUser>({
+const userSchema = new Schema<TUser,IUserModel>({
   userId: {
     type: Number,
     required: [true,'userId must be required'],
@@ -77,10 +79,27 @@ const userSchema = new Schema<TUser>({
     required: [true,"hobbies must be required"]
   },
   address: addressSchema,
-  orders: orderSchema,
+  orders: [orderSchema],
 })
 
+// create user pre or post validation
+// password hash
+userSchema.pre('save',async function (next){
+  this.password = await bcrypt.hash(this.password || '',Number(config.salt_Rounds))
+  next()
+})
 
-const User = model<TUser>('User',userSchema)
+// own statics method
+userSchema.statics.customFindUser = async function({queryType,search = {},id}: TQuery){
+  if(queryType === 'find'){
+    return await this.find(search,{password: 0,__v: 0})
+  }else if(queryType === 'findById' && id !== null){
+    return await this.findById({_id: id},{password: 0})
+  }else if(queryType === 'findOne'){
+    return await this.findOne(search,{password: 0,__v: 0})
+  }
+}
+
+const User = model<TUser,IUserModel>('User',userSchema)
 
 export default User

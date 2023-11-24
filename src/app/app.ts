@@ -2,11 +2,12 @@ import express, { Request, Response } from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 import { errorHandler, notFoundError } from './ErrorBoundary/errorBoundary'
+import userRoutes from './modules/users/user.routes'
 const app = express()
 
 // middleware
 app.use(express.json())
-app.use(cors({}))
+app.use(cors())
 app.use(morgan('dev'))
 
 
@@ -17,6 +18,9 @@ app.get('/health',(_req: Request,res: Response) => {
     message: 'Route Health is Good'
   })
 })
+
+// user routes
+app.use('/api/users',userRoutes)
 
 // error boundary middleware
 app.use(notFoundError)

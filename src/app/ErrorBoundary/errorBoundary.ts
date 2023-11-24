@@ -21,7 +21,7 @@ export const errorHandler = (error:any ,_req: Request,res: Response, _next: Next
   }
   res.status(500).json({
     success: false,
-    message:'Something went wrong',
+    message: error.message,
     error: {
       code: 500,
       description: "I think you are something mistake please check your input"
