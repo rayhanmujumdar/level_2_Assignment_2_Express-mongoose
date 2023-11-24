@@ -28,7 +28,7 @@ const orderSchemaValidation = z.object({
 
 // user validation
 export const userSchemaValidation = z.object({
-  userId: z.number({required_error: "userId must be required"}),
+  userId: z.number({required_error: "userId must be required"}).or(z.string()),
   username: z.string({required_error: "username must be required"}),
   password: z.string({required_error: "password must be required"}).max(20),
   fullName: userNameSchemaValidation.required(),

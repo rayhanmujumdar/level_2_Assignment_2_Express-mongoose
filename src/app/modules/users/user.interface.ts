@@ -22,7 +22,7 @@ export type TOrder = {
 
 // user type
 export type TUser = {
- userId: number;
+ userId: number | string;
  username: string;
  password: string | undefined;
  fullName: TUsername;
@@ -36,15 +36,15 @@ export type TUser = {
 
 // user model
 export type TQueryType = "find" | "findById" | "findOne";
-type fieldKey = {
+export type TUserField = Partial<{
     [index in keyof TUser] : unknown
-}
+} & {__v: number}>
 
 export type TQuery = {
  queryType: TQueryType;
  id?: TQueryType extends 'findById' ? string : null;
- search?: Partial<fieldKey>
+ searchField?: TUserField
 };
 export interface IUserModel extends Model<TUser> {
- customFindUser(query: TQuery): TUser;
+ customFindUser(query: TQuery,projection?: TUserField): TUser;
 }

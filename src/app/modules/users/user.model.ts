@@ -1,7 +1,6 @@
 import { Schema,model } from "mongoose";
-import { IUserModel, TAddress, TOrder, TQuery, TUser, TUsername } from "./user.interface";
-import bcrypt from "bcrypt"
-import config from "../../config";
+import { IUserModel, TAddress, TOrder, TQuery, TUser, TUserField, TUsername } from "./user.interface";
+import hashStr from "../../lib/hashStr";
 
 // fullName schema
 const userNameSchema = new Schema<TUsername>({
@@ -85,18 +84,27 @@ const userSchema = new Schema<TUser,IUserModel>({
 // create user pre or post validation
 // password hash
 userSchema.pre('save',async function (next){
-  this.password = await bcrypt.hash(this.password || '',Number(config.salt_Rounds))
+  this.password = await hashStr(this.password)
+  next()
+})
+
+userSchema.pre('findOneAndUpdate',async function (next){
+  const password = this.get("password")
+  if(password){
+    const hashPassword = await hashStr(password)
+    this.set('password',hashPassword)
+  }
   next()
 })
 
 // own statics method
-userSchema.statics.customFindUser = async function({queryType,search = {},id}: TQuery){
+userSchema.statics.customFindUser = function({queryType,searchField = {},id}: TQuery, projection: TUserField){
   if(queryType === 'find'){
-    return await this.find(search,{password: 0,__v: 0})
+    return this.find(searchField,projection)
   }else if(queryType === 'findById' && id !== null){
-    return await this.findById({_id: id},{password: 0})
+    return this.findById({_id: id},projection)
   }else if(queryType === 'findOne'){
-    return await this.findOne(search,{password: 0,__v: 0})
+    return this.findOne(searchField,projection)
   }
 }
 

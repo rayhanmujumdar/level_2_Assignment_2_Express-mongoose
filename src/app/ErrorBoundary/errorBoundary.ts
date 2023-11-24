@@ -12,7 +12,7 @@ export const errorHandler = (error:any ,_req: Request,res: Response, _next: Next
   if(error && error.status){
     res.status(error.status).json({
       success: false,
-      message: "Something went wrong",
+      message: 'Something was wrong,please check error.description',
       error: {
         code: error.status,
         description: error.message

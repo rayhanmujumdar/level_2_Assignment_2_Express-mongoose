@@ -3,6 +3,7 @@ import {
   createNewUserService,
   getAllUsersService,
   getSingleUserService,
+  updateUserService
 } from "./user.services";
 import { userSchemaValidation } from "./user.validation";
 import error from "../../lib/error";
@@ -55,6 +56,9 @@ export const getSingleUserController = async (
   try {
     const {userId} = req.params
     const user = await getSingleUserService(userId);
+    if(!user) {
+      throw error(500, "User Not Found")
+    }
     res.status(200).json({
       success: true,
       message: "User fetched successfully!",
@@ -64,3 +68,20 @@ export const getSingleUserController = async (
     next(error(500, parseErrorMsg(err)));
   }
 };
+
+
+// updated user data
+export const updateUserController = async (req:Request,res:Response,next:NextFunction) => {
+  try {
+    const userData = req.body
+    const {userId} = req.params
+    const updatedUser = await updateUserService(userId,userData)
+    res.status(200).json({
+      success: true,
+      message: 'User updated successfully!',
+      data: updatedUser
+    })
+  }catch(err){
+    next(error(500,parseErrorMsg(err)))
+  }
+}
