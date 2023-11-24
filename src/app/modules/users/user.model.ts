@@ -71,6 +71,7 @@ const userSchema = new Schema<TUser,IUserModel>({
   },
   isActive: {
     type: Boolean,
+    default: true,
     required: [true,"quantity must be required"]
   },
   hobbies: {
@@ -79,15 +80,20 @@ const userSchema = new Schema<TUser,IUserModel>({
   },
   address: addressSchema,
   orders: [orderSchema],
+  isDeleted: {
+    type: Boolean,
+    default: false
+  }
 })
 
 // create user pre or post validation
-// password hash
+// before save to password hash
 userSchema.pre('save',async function (next){
   this.password = await hashStr(this.password)
   next()
 })
 
+// before update to password hash
 userSchema.pre('findOneAndUpdate',async function (next){
   const password = this.get("password")
   if(password){
@@ -97,12 +103,23 @@ userSchema.pre('findOneAndUpdate',async function (next){
   next()
 })
 
+// deleted user check
+userSchema.pre("find", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+userSchema.pre("findOne", function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
 // own statics method
 userSchema.statics.customFindUser = function({queryType,searchField = {},id}: TQuery, projection: TUserField){
   if(queryType === 'find'){
     return this.find(searchField,projection)
   }else if(queryType === 'findById' && id !== null){
-    return this.findById({_id: id},projection)
+    return this.findById(id,projection)
   }else if(queryType === 'findOne'){
     return this.findOne(searchField,projection)
   }

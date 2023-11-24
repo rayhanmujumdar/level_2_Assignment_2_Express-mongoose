@@ -32,6 +32,7 @@ export type TUser = {
  hobbies: string[];
  address: TAddress;
  orders?: TOrder[];
+ isDeleted?: boolean
 };
 
 // user model
@@ -42,7 +43,7 @@ export type TUserField = Partial<{
 
 export type TQuery = {
  queryType: TQueryType;
- id?: TQueryType extends 'findById' ? string : null;
+ id?: string;
  searchField?: TUserField
 };
 export interface IUserModel extends Model<TUser> {

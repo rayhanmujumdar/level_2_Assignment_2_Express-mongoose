@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createUserController, getAllUsersController, getSingleUserController, updateUserController } from "./user.controller";
+import { createUserController, deleteUserController, getAllUsersController, getSingleUserController, updateUserController } from "./user.controller";
 
 const userRoutes = Router()
 
@@ -15,6 +15,9 @@ userRoutes.get('/:userId',getSingleUserController)
 
 // Update user information route
 userRoutes.put('/:userId',updateUserController)
+
+// delete user information route
+userRoutes.delete('/:userId',deleteUserController)
 
 
 export default userRoutes

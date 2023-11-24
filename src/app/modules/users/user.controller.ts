@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import {
   createNewUserService,
+  deleteUserService,
   getAllUsersService,
   getSingleUserService,
   updateUserService
@@ -83,5 +84,26 @@ export const updateUserController = async (req:Request,res:Response,next:NextFun
     })
   }catch(err){
     next(error(500,parseErrorMsg(err)))
+  }
+}
+
+// delete user data
+export const deleteUserController = async (req: Request,res: Response,next: NextFunction) => {
+  try{
+    const {userId} = req.params
+    const result = await deleteUserService(userId) 
+    if(result.modifiedCount === 0 && result.matchedCount === 1){
+      throw error(500, "User already deleted")
+    }
+    if(result.matchedCount === 0){
+      throw error(500,"User not found")
+    }
+    res.status(200).json({
+      success: true,
+      message: 'User information delete successfully',
+      data: null
+    })
+  }catch(err){
+    next(err)
   }
 }
