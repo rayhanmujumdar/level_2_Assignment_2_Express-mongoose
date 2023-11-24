@@ -3,14 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorHandler = exports.notFoundError = void 0;
 const notFoundError = (_req, _res, next) => {
     const err = new Error('Response not found');
-    err.status = 500;
+    err.status = 404;
     next(err);
 };
 exports.notFoundError = notFoundError;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const errorHandler = (error, req, res, next) => {
+const errorHandler = (error, _req, res, _next) => {
     if (error && error.status) {
-        return res.status(error.status).json({
+        res.status(error.status).json({
             success: false,
             message: "Something went wrong",
             error: {
@@ -19,7 +19,7 @@ const errorHandler = (error, req, res, next) => {
             }
         });
     }
-    return res.status(500).json({
+    res.status(500).json({
         success: false,
         message: 'Something went wrong',
         error: {

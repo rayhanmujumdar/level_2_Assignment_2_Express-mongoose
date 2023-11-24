@@ -3,14 +3,14 @@ import { NextFunction, Request, Response } from "express"
 
 export const notFoundError = (_req: Request,_res:Response,next: NextFunction):void => {
   const err:any = new Error('Response not found')
-  err.status = 500
+  err.status = 404
   next(err)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const errorHandler = (error:any ,req: Request,res: Response, next: NextFunction) => {
+export const errorHandler = (error:any ,_req: Request,res: Response, _next: NextFunction) => {
   if(error && error.status){
-    return res.status(error.status).json({
+    res.status(error.status).json({
       success: false,
       message: "Something went wrong",
       error: {
@@ -19,7 +19,7 @@ export const errorHandler = (error:any ,req: Request,res: Response, next: NextFu
       }
     })
   }
-  return res.status(500).json({
+  res.status(500).json({
     success: false,
     message:'Something went wrong',
     error: {
