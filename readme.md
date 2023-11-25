@@ -281,7 +281,7 @@
 
 GitHub Link → https://github.com/rayhanmujumdar/level_2_Assignment_2_Express-mongoose
 
-Host Link →  [simple-use-project](https://simple-user-project-9uyf9bfwx-rayhanmujumdar.vercel.app/health)
+Host Link →  [simple-use-project](https://simple-user-project-rayhanmujumdar.vercel.app/health)
 
 ## Reference:
 

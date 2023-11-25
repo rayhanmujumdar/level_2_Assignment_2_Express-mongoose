@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userSchemaValidation = void 0;
+exports.userSchemaValidation = exports.orderSchemaValidation = void 0;
 const zod_1 = require("zod");
 // user fullName validation
 const userNameSchemaValidation = zod_1.z.object({
@@ -17,7 +17,7 @@ const addressSchemaValidation = zod_1.z.object({
     country: zod_1.z.string({ required_error: 'country must be required' })
 });
 // order schema validation
-const orderSchemaValidation = zod_1.z.object({
+exports.orderSchemaValidation = zod_1.z.object({
     productName: zod_1.z.string({ required_error: "productName must be required" }),
     price: zod_1.z.number({ required_error: "price must be required" }),
     quantity: zod_1.z.number({ required_error: "quantity must be required" })
@@ -33,6 +33,6 @@ exports.userSchemaValidation = zod_1.z.object({
     isActive: zod_1.z.boolean({ required_error: 'isActive must be required' }).default(true),
     hobbies: zod_1.z.string({ required_error: 'hobbies must be required' }).array(),
     address: addressSchemaValidation.required(),
-    orders: orderSchemaValidation.array().optional(),
+    orders: exports.orderSchemaValidation.array().optional(),
     isDeleted: zod_1.z.boolean().default(false)
 });

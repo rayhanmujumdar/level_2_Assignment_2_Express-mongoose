@@ -55,7 +55,7 @@ const orderSchema = new mongoose_1.Schema({
         required: [true, "quantity must be required"]
     }
 }, { _id: false });
-// userSchema
+// user model schema
 const userSchema = new mongoose_1.Schema({
     userId: {
         type: Number,
@@ -110,13 +110,24 @@ userSchema.pre('findOneAndUpdate', function (next) {
         next();
     });
 });
-// deleted user check
+// before check , is users exist in database!
 userSchema.pre("find", function (next) {
     this.find({ isDeleted: { $ne: true } });
     next();
 });
 userSchema.pre("findOne", function (next) {
-    this.find({ isDeleted: { $ne: true } });
+    this.findOne({ isDeleted: { $ne: true } });
+    next();
+});
+// before update check the user is exist or not
+userSchema.pre("updateOne", function (next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        this.findOne({ isDeleted: { $ne: true } });
+        next();
+    });
+});
+userSchema.pre("findOneAndUpdate", function (next) {
+    this.findOne({ isDeleted: { $ne: true } });
     next();
 });
 // own statics method

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUserController = exports.updateUserController = exports.getSingleUserController = exports.getAllUsersController = exports.createUserController = void 0;
+exports.calculateTotalPriceInUsersOrderController = exports.getUserOrdersController = exports.addNewProductInOrderController = exports.deleteUserController = exports.updateUserController = exports.getSingleUserController = exports.getAllUsersController = exports.createUserController = void 0;
 const user_services_1 = require("./user.services");
 const user_validation_1 = require("./user.validation");
 const error_1 = __importDefault(require("../../lib/error"));
@@ -74,6 +74,9 @@ const updateUserController = (req, res, next) => __awaiter(void 0, void 0, void 
         const userData = req.body;
         const { userId } = req.params;
         const updatedUser = yield (0, user_services_1.updateUserService)(userId, userData);
+        if (!updatedUser) {
+            throw (0, error_1.default)(500, "User Not Found");
+        }
         res.status(200).json({
             success: true,
             message: 'User updated successfully!',
@@ -103,7 +106,69 @@ const deleteUserController = (req, res, next) => __awaiter(void 0, void 0, void 
         });
     }
     catch (err) {
-        next(err);
+        next((0, error_1.default)(500, (0, parseErrorMsg_1.default)(err)));
     }
 });
 exports.deleteUserController = deleteUserController;
+// Add New Product in Order controller
+const addNewProductInOrderController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const product = req.body;
+        const { userId } = req.params;
+        const productValidatedData = user_validation_1.orderSchemaValidation.parse(product);
+        const result = yield (0, user_services_1.addNewProductInOrderService)(userId, productValidatedData);
+        if (!result.modifiedCount) {
+            throw (0, error_1.default)(500, "User Not Found");
+        }
+        res.status(201).json({
+            success: true,
+            message: 'Order created successfully',
+            data: null
+        });
+    }
+    catch (err) {
+        next((0, error_1.default)(500, (0, parseErrorMsg_1.default)(err)));
+    }
+});
+exports.addNewProductInOrderController = addNewProductInOrderController;
+// get user orders by userId
+const getUserOrdersController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const userOrders = yield (0, user_services_1.getUserOrdersService)(userId);
+        if (!userOrders) {
+            throw (0, error_1.default)(500, "User not found");
+        }
+        res.status(200).json({
+            success: true,
+            message: 'Order fetched successfully!',
+            data: {
+                orders: userOrders.orders
+            }
+        });
+    }
+    catch (err) {
+        next((0, error_1.default)(500, (0, parseErrorMsg_1.default)(err)));
+    }
+});
+exports.getUserOrdersController = getUserOrdersController;
+// calculate total price in user order
+const calculateTotalPriceInUsersOrderController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const { userId } = req.params;
+        const totalPrice = yield (0, user_services_1.calculateTotalPriceInUserOrderService)(userId);
+        if (!((_a = totalPrice === null || totalPrice === void 0 ? void 0 : totalPrice[0]) === null || _a === void 0 ? void 0 : _a.totalPrice)) {
+            throw (0, error_1.default)(500, "User orders Not found");
+        }
+        res.status(200).json({
+            success: true,
+            message: "Total price calculated successfully!",
+            data: totalPrice[0]
+        });
+    }
+    catch (err) {
+        next((0, error_1.default)(500, (0, parseErrorMsg_1.default)(err)));
+    }
+});
+exports.calculateTotalPriceInUsersOrderController = calculateTotalPriceInUsersOrderController;
