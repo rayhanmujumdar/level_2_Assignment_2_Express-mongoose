@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addNewProductInOrderController, createUserController, deleteUserController, getAllUsersController, getSingleUserController, updateUserController } from "./user.controller";
+import { addNewProductInOrderController, createUserController, deleteUserController, getAllUsersController, getSingleUserController, getUserOrdersController, updateUserController } from "./user.controller";
 
 const userRoutes = Router()
 
@@ -21,8 +21,14 @@ userRoutes.delete('/:userId',deleteUserController)
 
 
 // user with orders routes
+
 // Add New Product in Order route
 userRoutes.put('/:userId/orders',addNewProductInOrderController)
+
+
+// get user orders route
+userRoutes.get('/:userId/orders', getUserOrdersController)
+
 
 
 export default userRoutes

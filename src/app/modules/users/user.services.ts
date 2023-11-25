@@ -26,10 +26,6 @@ export const getSingleUserService = (userId: string | number) => {
 }
 // update user service
 export const updateUserService = async (userId: string | number,userData: TUser) => {
-  // const user = await User.customFindUser({queryType: 'findOne',searchField: {userId}}) 
-  // if(!user){
-  //   throw error(500,"User not exist")
-  // }
   const projection = {password: 0,__v: 0,orders: 0,isDeleted: 0}
   return User.findOneAndUpdate({userId}, userData,{projection,new: true})
 }
@@ -40,6 +36,11 @@ export const deleteUserService = (userId: string | number) => {
 }
 
 // add new product in order service
-export const addNewProductInOrderService = (id: string,productData: TOrder) => {
-  return User.updateOne({userId: id}, {$push: {orders: productData}})
+export const addNewProductInOrderService = (userId: string,productData: TOrder) => {
+  return User.updateOne({userId: userId}, {$push: {orders: productData}})
+}
+
+//  all orders for a specific user service
+export const getUserOrdersService = (userId: string) => {
+  return User.customFindUser({queryType: 'findOne',searchField: {userId}}, {orders: 1})
 }

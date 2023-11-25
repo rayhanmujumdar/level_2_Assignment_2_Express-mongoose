@@ -1,7 +1,6 @@
 import { Schema,model } from "mongoose";
 import { IUserModel, TAddress, TOrder, TQuery, TUser, TUserField, TUsername } from "./user.interface";
 import hashStr from "../../lib/hashStr";
-import error from "../../lib/error";
 
 // fullName schema
 const userNameSchema = new Schema<TUsername>({
@@ -113,27 +112,19 @@ userSchema.pre("find", function (next) {
 });
 
 userSchema.pre("findOne", function (next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
+  this.findOne({ isDeleted: { $ne: true } });
+  next()
 });
 
 // before update check the user is exist or not
 userSchema.pre("updateOne", async function (next) {
-  const userId = this.getQuery().userId
-  const user = await this.model.findOne({userId, isDeleted: true})
-  if(user){
-    next();
-  }
-  next(error(500,"User not found"))
+  this.findOne({ isDeleted: {$ne: true} })
+  next()
 });
 
-userSchema.pre("findOneAndUpdate", async function (next) {
-  const userId = this.getQuery().userId
-  const user = await this.model.findOne({userId, isDeleted: true})
-  if(user){
-    next();
-  }
-  next(error(500,"User not found"))
+userSchema.pre("findOneAndUpdate", function (next) {
+  this.findOne({ isDeleted: {$ne: true}})
+  next()
 });
 
 // own statics method

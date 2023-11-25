@@ -1,8 +1,10 @@
+
 import { NextFunction, Request, Response } from "express";
 import {
   addNewProductInOrderService,
   createNewUserService,
   deleteUserService,
+  getUserOrdersService,
   getAllUsersService,
   getSingleUserService,
   updateUserService
@@ -78,6 +80,9 @@ export const updateUserController = async (req:Request,res:Response,next:NextFun
     const userData = req.body
     const {userId} = req.params
     const updatedUser = await updateUserService(userId,userData)
+    if(!updatedUser) {
+      throw error(500, "User Not Found")
+    }
     res.status(200).json({
       success: true,
       message: 'User updated successfully!',
@@ -117,11 +122,33 @@ export const addNewProductInOrderController = async (req:Request,res:Response,ne
     const {userId} = req.params
     const productValidatedData = orderSchemaValidation.parse(product)
     const result = await addNewProductInOrderService(userId,productValidatedData)
-    console.log(result);
+    if(!result.modifiedCount) {
+      throw error(500, "User Not Found")
+    }
     res.status(201).json({
       success: true,
       message: 'Order created successfully',
       data: null
+    })
+  }catch(err){
+    next(error(500,parseErrorMsg(err)))
+  }
+}
+
+// get user orders by userId
+export const getUserOrdersController = async (req:Request,res:Response,next: NextFunction) => {
+  try{
+    const {userId} = req.params
+    const userOrders = await getUserOrdersService(userId)
+    if(!userOrders){
+      throw error(500,"User not found")
+    }
+    res.status(200).json({
+      success: true,
+      message: 'Order fetched successfully!',
+      data: {
+        orders: userOrders.orders
+      }
     })
   }catch(err){
     next(error(500,parseErrorMsg(err)))
