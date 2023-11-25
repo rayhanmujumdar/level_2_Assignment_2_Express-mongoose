@@ -13,8 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const config_1 = __importDefault(require("../../config"));
+const hashStr_1 = __importDefault(require("../../lib/hashStr"));
 // fullName schema
 const userNameSchema = new mongoose_1.Schema({
     firstName: {
@@ -78,6 +77,7 @@ const userSchema = new mongoose_1.Schema({
     },
     isActive: {
         type: Boolean,
+        default: true,
         required: [true, "quantity must be required"]
     },
     hobbies: {
@@ -86,28 +86,50 @@ const userSchema = new mongoose_1.Schema({
     },
     address: addressSchema,
     orders: [orderSchema],
+    isDeleted: {
+        type: Boolean,
+        default: false
+    }
 });
 // create user pre or post validation
-// password hash
+// before save to password hash
 userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        this.password = yield bcrypt_1.default.hash(this.password || '', Number(config_1.default.salt_Rounds));
+        this.password = yield (0, hashStr_1.default)(this.password);
         next();
     });
 });
-// own statics method
-userSchema.statics.customFindUser = function ({ queryType, search = {}, id }) {
+// before update to password hash
+userSchema.pre('findOneAndUpdate', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (queryType === 'find') {
-            return yield this.find(search, { password: 0, __v: 0 });
+        const password = this.get("password");
+        if (password) {
+            const hashPassword = yield (0, hashStr_1.default)(password);
+            this.set('password', hashPassword);
         }
-        else if (queryType === 'findById' && id !== null) {
-            return yield this.findById({ _id: id }, { password: 0 });
-        }
-        else if (queryType === 'findOne') {
-            return yield this.findOne(search, { password: 0, __v: 0 });
-        }
+        next();
     });
+});
+// deleted user check
+userSchema.pre("find", function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+userSchema.pre("findOne", function (next) {
+    this.find({ isDeleted: { $ne: true } });
+    next();
+});
+// own statics method
+userSchema.statics.customFindUser = function ({ queryType, searchField = {}, id }, projection) {
+    if (queryType === 'find') {
+        return this.find(searchField, projection);
+    }
+    else if (queryType === 'findById' && id !== null) {
+        return this.findById(id, projection);
+    }
+    else if (queryType === 'findOne') {
+        return this.findOne(searchField, projection);
+    }
 };
 const User = (0, mongoose_1.model)('User', userSchema);
 exports.default = User;

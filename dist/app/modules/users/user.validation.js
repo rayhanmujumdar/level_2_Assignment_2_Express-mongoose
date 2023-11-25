@@ -25,13 +25,14 @@ const orderSchemaValidation = zod_1.z.object({
 // user validation
 exports.userSchemaValidation = zod_1.z.object({
     userId: zod_1.z.number({ required_error: "userId must be required" }).or(zod_1.z.string()),
-    username: zod_1.z.string({ required_error: "username must be required" }),
+    username: zod_1.z.string({ required_error: "username must be required" }).toLowerCase(),
     password: zod_1.z.string({ required_error: "password must be required" }).max(20),
     fullName: userNameSchemaValidation.required(),
     age: zod_1.z.number({ required_error: "age must be required" }).gte(12, { message: "minimum your age required 12" }),
     email: zod_1.z.string({ required_error: "email must be required" }).email({ message: 'invalid email address' }),
-    isActive: zod_1.z.boolean().default(true),
+    isActive: zod_1.z.boolean({ required_error: 'isActive must be required' }).default(true),
     hobbies: zod_1.z.string({ required_error: 'hobbies must be required' }).array(),
     address: addressSchemaValidation.required(),
-    orders: orderSchemaValidation.array().optional()
+    orders: orderSchemaValidation.array().optional(),
+    isDeleted: zod_1.z.boolean().default(false)
 });

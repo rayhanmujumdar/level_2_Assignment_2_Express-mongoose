@@ -19,7 +19,7 @@ const addressSchemaValidation = z.object({
 })
 
 // order schema validation
-const orderSchemaValidation = z.object({
+export const orderSchemaValidation = z.object({
   productName: z.string({required_error: "productName must be required"}),
   price: z.number({required_error: "price must be required"}),
   quantity: z.number({required_error: "quantity must be required"})

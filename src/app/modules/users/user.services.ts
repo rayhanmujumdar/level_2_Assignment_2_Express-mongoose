@@ -1,5 +1,4 @@
-import error from "../../lib/error";
-import { TQuery, TUser, TUserField } from "./user.interface";
+import { TOrder, TQuery, TUser, TUserField } from "./user.interface";
 import User from "./user.model";
 
 // create user service
@@ -27,10 +26,10 @@ export const getSingleUserService = (userId: string | number) => {
 }
 // update user service
 export const updateUserService = async (userId: string | number,userData: TUser) => {
-  const user = await User.customFindUser({queryType: 'findOne',searchField: {userId}}) 
-  if(!user){
-    throw error(500,"User not exist")
-  }
+  // const user = await User.customFindUser({queryType: 'findOne',searchField: {userId}}) 
+  // if(!user){
+  //   throw error(500,"User not exist")
+  // }
   const projection = {password: 0,__v: 0,orders: 0,isDeleted: 0}
   return User.findOneAndUpdate({userId}, userData,{projection,new: true})
 }
@@ -38,4 +37,9 @@ export const updateUserService = async (userId: string | number,userData: TUser)
 // deleted user service
 export const deleteUserService = (userId: string | number) => {
   return User.updateOne({userId}, {isDeleted: true})
-} 
+}
+
+// add new product in order service
+export const addNewProductInOrderService = (id: string,productData: TOrder) => {
+  return User.updateOne({userId: id}, {$push: {orders: productData}})
+}

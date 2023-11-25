@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import {
+  addNewProductInOrderService,
   createNewUserService,
   deleteUserService,
   getAllUsersService,
   getSingleUserService,
   updateUserService
 } from "./user.services";
-import { userSchemaValidation } from "./user.validation";
+import { orderSchemaValidation, userSchemaValidation } from "./user.validation";
 import error from "../../lib/error";
 import parseErrorMsg from "../../lib/parseErrorMsg";
 
@@ -104,6 +105,25 @@ export const deleteUserController = async (req: Request,res: Response,next: Next
       data: null
     })
   }catch(err){
-    next(err)
+    next(error(500,parseErrorMsg(err)))
+  }
+}
+
+
+// Add New Product in Order controller
+export const addNewProductInOrderController = async (req:Request,res:Response,next: NextFunction) => {
+  try{
+    const product = req.body
+    const {userId} = req.params
+    const productValidatedData = orderSchemaValidation.parse(product)
+    const result = await addNewProductInOrderService(userId,productValidatedData)
+    console.log(result);
+    res.status(201).json({
+      success: true,
+      message: 'Order created successfully',
+      data: null
+    })
+  }catch(err){
+    next(error(500,parseErrorMsg(err)))
   }
 }

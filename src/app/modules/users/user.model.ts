@@ -1,6 +1,7 @@
 import { Schema,model } from "mongoose";
 import { IUserModel, TAddress, TOrder, TQuery, TUser, TUserField, TUsername } from "./user.interface";
 import hashStr from "../../lib/hashStr";
+import error from "../../lib/error";
 
 // fullName schema
 const userNameSchema = new Schema<TUsername>({
@@ -48,7 +49,7 @@ const orderSchema = new Schema<TOrder>({
 
 
 
-// userSchema
+// user model schema
 const userSchema = new Schema<TUser,IUserModel>({
   userId: {
     type: Number,
@@ -86,6 +87,8 @@ const userSchema = new Schema<TUser,IUserModel>({
   }
 })
 
+
+
 // create user pre or post validation
 // before save to password hash
 userSchema.pre('save',async function (next){
@@ -103,7 +106,7 @@ userSchema.pre('findOneAndUpdate',async function (next){
   next()
 })
 
-// deleted user check
+// before check , is users exist in database!
 userSchema.pre("find", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
@@ -112,6 +115,25 @@ userSchema.pre("find", function (next) {
 userSchema.pre("findOne", function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
+});
+
+// before update check the user is exist or not
+userSchema.pre("updateOne", async function (next) {
+  const userId = this.getQuery().userId
+  const user = await this.model.findOne({userId, isDeleted: true})
+  if(user){
+    next();
+  }
+  next(error(500,"User not found"))
+});
+
+userSchema.pre("findOneAndUpdate", async function (next) {
+  const userId = this.getQuery().userId
+  const user = await this.model.findOne({userId, isDeleted: true})
+  if(user){
+    next();
+  }
+  next(error(500,"User not found"))
 });
 
 // own statics method

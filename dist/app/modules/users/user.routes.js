@@ -11,4 +11,6 @@ userRoutes.get('/', user_controller_1.getAllUsersController);
 userRoutes.get('/:userId', user_controller_1.getSingleUserController);
 // Update user information route
 userRoutes.put('/:userId', user_controller_1.updateUserController);
+// delete user information route
+userRoutes.delete('/:userId', user_controller_1.deleteUserController);
 exports.default = userRoutes;

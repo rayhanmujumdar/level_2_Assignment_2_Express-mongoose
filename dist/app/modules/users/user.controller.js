@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserController = exports.getSingleUserController = exports.getAllUsersController = exports.createUserController = void 0;
+exports.deleteUserController = exports.updateUserController = exports.getSingleUserController = exports.getAllUsersController = exports.createUserController = void 0;
 const user_services_1 = require("./user.services");
 const user_validation_1 = require("./user.validation");
 const error_1 = __importDefault(require("../../lib/error"));
@@ -85,3 +85,25 @@ const updateUserController = (req, res, next) => __awaiter(void 0, void 0, void 
     }
 });
 exports.updateUserController = updateUserController;
+// delete user data
+const deleteUserController = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params;
+        const result = yield (0, user_services_1.deleteUserService)(userId);
+        if (result.modifiedCount === 0 && result.matchedCount === 1) {
+            throw (0, error_1.default)(500, "User already deleted");
+        }
+        if (result.matchedCount === 0) {
+            throw (0, error_1.default)(500, "User not found");
+        }
+        res.status(200).json({
+            success: true,
+            message: 'User information delete successfully',
+            data: null
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
+exports.deleteUserController = deleteUserController;
