@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { addNewProductInOrderController, createUserController, deleteUserController, getAllUsersController, getSingleUserController, getUserOrdersController, updateUserController } from "./user.controller";
+import { addNewProductInOrderController, calculateTotalPriceInUsersOrderController, createUserController, deleteUserController, getAllUsersController, getSingleUserController, getUserOrdersController, updateUserController } from "./user.controller";
 
 const userRoutes = Router()
 
+// * only user routes
 
 // Create a new user route
 userRoutes.post('/',createUserController)
@@ -20,7 +21,7 @@ userRoutes.put('/:userId',updateUserController)
 userRoutes.delete('/:userId',deleteUserController)
 
 
-// user with orders routes
+// * user with orders routes
 
 // Add New Product in Order route
 userRoutes.put('/:userId/orders',addNewProductInOrderController)
@@ -29,6 +30,7 @@ userRoutes.put('/:userId/orders',addNewProductInOrderController)
 // get user orders route
 userRoutes.get('/:userId/orders', getUserOrdersController)
 
-
+// calculate total price route
+userRoutes.get('/:userId/orders/total-price',calculateTotalPriceInUsersOrderController)
 
 export default userRoutes

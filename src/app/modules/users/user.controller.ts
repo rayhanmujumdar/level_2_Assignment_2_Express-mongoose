@@ -7,7 +7,8 @@ import {
   getUserOrdersService,
   getAllUsersService,
   getSingleUserService,
-  updateUserService
+  updateUserService,
+  calculateTotalPriceInUserOrderService
 } from "./user.services";
 import { orderSchemaValidation, userSchemaValidation } from "./user.validation";
 import error from "../../lib/error";
@@ -149,6 +150,24 @@ export const getUserOrdersController = async (req:Request,res:Response,next: Nex
       data: {
         orders: userOrders.orders
       }
+    })
+  }catch(err){
+    next(error(500,parseErrorMsg(err)))
+  }
+}
+
+// calculate total price in user order
+export const calculateTotalPriceInUsersOrderController =  async (req:Request,res: Response,next: NextFunction) => {
+  try{
+    const {userId} = req.params
+    const totalPrice = await calculateTotalPriceInUserOrderService(userId)
+    if(!totalPrice?.[0]?.totalPrice){
+      throw error(500,"User orders Not found")
+    }
+    res.status(200).json({
+      success: true,
+      message: "Total price calculated successfully!",
+      data: totalPrice[0]
     })
   }catch(err){
     next(error(500,parseErrorMsg(err)))

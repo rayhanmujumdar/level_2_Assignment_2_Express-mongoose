@@ -1,3 +1,4 @@
+import error from "../../lib/error";
 import { TOrder, TQuery, TUser, TUserField } from "./user.interface";
 import User from "./user.model";
 
@@ -36,11 +37,42 @@ export const deleteUserService = (userId: string | number) => {
 }
 
 // add new product in order service
-export const addNewProductInOrderService = (userId: string,productData: TOrder) => {
+export const addNewProductInOrderService = (userId: string | number,productData: TOrder) => {
   return User.updateOne({userId: userId}, {$push: {orders: productData}})
 }
 
 //  all orders for a specific user service
 export const getUserOrdersService = (userId: string) => {
   return User.customFindUser({queryType: 'findOne',searchField: {userId}}, {orders: 1})
+}
+
+// calculate total user order price service
+export const calculateTotalPriceInUserOrderService = async (userId: string | number) => {
+  const user =  await User.customFindUser({queryType: 'findOne',searchField: {userId}}, {orders: 1})
+  if(!user) {
+    throw error(500, "User not found")
+  }
+  const id = typeof Number(userId) === 'number' ? Number(userId) : userId
+  return User.aggregate([
+    // stage - 1 
+    {
+      $match: {
+        userId: id
+      }
+    },
+    // stage - 2
+    {
+      $unwind: "$orders"
+    },
+    // stage - 3
+    {
+      $group: { _id: "$orders", totalPrice: { $sum: { $multiply: [ "$orders.price", "$orders.quantity" ] } }}
+    },
+    // stage - 4
+    {
+      $project: {
+        _id: 0
+      }
+    }
+  ])
 }
