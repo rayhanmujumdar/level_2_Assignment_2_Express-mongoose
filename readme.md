@@ -256,7 +256,7 @@
 - morgan → for log my client request
 - cors → for cross platform support
 
-## How to Set up project?
+## How to Set up project locally?
 
 1. first of all , clone project from git hub
     
